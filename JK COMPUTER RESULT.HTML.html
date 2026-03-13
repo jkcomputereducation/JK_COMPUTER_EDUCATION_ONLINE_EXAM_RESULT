@@ -1,0 +1,116 @@
+﻿<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JK COMPUTER - Digital Marksheet Verification</title>
+    <style>
+        body { font-family: 'Arial', sans-serif; background: #f0f2f5; margin: 0; padding: 10px; }
+        .container { max-width: 650px; margin: 20px auto; background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.2); border-top: 10px solid #1a237e; }
+        .header { text-align: center; border-bottom: 3px solid #1a237e; padding-bottom: 10px; margin-bottom: 20px; }
+        .header h1 { margin: 0; color: #1a237e; font-size: 24px; text-transform: uppercase; font-weight: 800; }
+        .header p { margin: 5px 0; font-weight: bold; color: #333; font-size: 14px; }
+        .associated { color: #d32f2f; font-size: 12px; font-weight: bold; text-transform: uppercase; margin-top: 5px; }
+        .search-area { text-align: center; background: #e8eaf6; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #1a237e; }
+        input { padding: 12px; width: 60%; border: 2px solid #1a237e; border-radius: 5px; font-size: 18px; text-align: center; }
+        button { padding: 12px; background: #1a237e; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 10px; width: 100%; }
+        #marksheet { display: none; border: 2px solid #000; padding: 20px; background: #fff; position: relative; }
+        .st-info { display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid #ddd; padding-bottom: 10px; font-size: 13px; line-height: 1.6; text-align: left; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+        th, td { border: 1px solid #000; padding: 8px; text-align: center; }
+        th { background: #f2f2f2; }
+        .result-footer { margin-top: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .verified { border: 2px solid green; color: green; padding: 5px 15px; font-weight: bold; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>JK COMPUTER EDUCATION</h1>
+        <p>NANDAUR, SANT KABIR NAGAR (UP)</p>
+        <div class="associated">Associated From: GLISTER EDUVERSITY (210643)</div>
+    </div>
+
+    <div class="search-area">
+        <p style="font-weight:bold;">Student Roll Number (e.g. 0001, 0035)</p>
+        <input type="text" id="rollNo" placeholder="0001">
+        <button onclick="checkResult()">VIEW MARKSHEET</button>
+    </div>
+
+    <div id="marksheet">
+        <h3 style="text-align:center; text-decoration: underline; margin-top: 0;">STATEMENT OF MARKS</h3>
+        <div class="st-info" id="studentDetails"></div>
+        <table>
+            <thead>
+                <tr><th>S.N.</th><th>Subject Name</th><th>Max</th><th>Obtained</th></tr>
+            </thead>
+            <tbody id="marksBody"></tbody>
+        </table>
+        <div class="result-footer">
+            <div>
+                <p><strong>Total Marks:</strong> <span id="total"></span></p>
+                <p><strong>Grade:</strong> <span id="grade" style="font-size:18px; color:#1a237e; font-weight:bold;"></span></p>
+            </div>
+            <div class="verified">✓ VERIFIED</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const students = {
+        "0001": { name: "PRITI", father: "RAJKUMAR PARJAPATI", roll: "JK/ADCA/2025/0001", marks: [91,81,83,72,70,100,100], total: "597/700", grade: "A++" },
+        "0002": { name: "SHUBHAM", father: "BAIJNATH", roll: "JK/ADCA/2025/0002", marks: [70,90,82,80,90,100,100], total: "612/700", grade: "A++" },
+        "0003": { name: "ANKIT", father: "SHRIRAM", roll: "JK/ADCA/2025/0003", marks: [68,83,79,60,71,58,100], total: "519/700", grade: "A+" },
+        "0004": { name: "PRINCE", father: "SWAMINATH", roll: "JK/ADCA/2025/0004", marks: [98,98,70,92,70,61,100], total: "589/700", grade: "A++" },
+        "0005": { name: "ARYAN CHAUHAN", father: "RAJESH CHAUHAN", roll: "JK/ADCA/2025/0005", marks: [70,78,81,68,60,83,100], total: "540/700", grade: "A+" },
+        "0006": { name: "SURAJ KUMAR", father: "GANESH SHARMA", roll: "JK/ADCA/2025/0006", marks: [67,80,61,64,80,100,100], total: "552/700", grade: "A+" },
+        "0007": { name: "MANISHA PRAJAPATI", father: "JANG BAHADUR", roll: "JK/ADCA/2025/0007", marks: [92,83,78,71,80,100,100], total: "604/700", grade: "A++" },
+        "0008": { name: "MO AMAAN", father: "FAIZ MOHAMMAD", roll: "JK/ADCA/2025/0008", marks: [80,60,53,64,68,100,100], total: "525/700", grade: "A+" },
+        "0009": { name: "JEENAT KHATOON", father: "MUNNE KHAN", roll: "JK/ADCA/2025/0009", marks: [64,71,59,78,66,100,100], total: "538/700", grade: "A+" },
+        "0010": { name: "SATYANAM", father: "RAJU", roll: "JK/ADCA/2025/0010", marks: [90,80,82,78,80,80,100], total: "590/700", grade: "A++" },
+        "0011": { name: "NEELAM", father: "SURENDRA KUMAR", roll: "JK/ADCA/2025/0011", marks: [68,61,58,77,69,100,100], total: "533/700", grade: "A+" },
+        "0012": { name: "MOHAMMAD SHAHIL", father: "AHMAD HUSEN", roll: "JK/ADCA/2025/0012", marks: [98,91,90,100,80,100,100], total: "659/700", grade: "A++" },
+        "0013": { name: "ABDUL RAHEEM", father: "ABDUL KAREEM", roll: "JK/ADCA/2025/0013", marks: [98,100,90,85,90,100,100], total: "663/700", grade: "A++" },
+        "0014": { name: "KHUSHBU SHARMA", father: "YOGESH SHARMA", roll: "JK/ADCA/2025/0014", marks: [70,100,90,58,80,100,100], total: "598/700", grade: "A++" },
+        "0015": { name: "ROSHANI", father: "RAMCHANDRA", roll: "JK/ADCA/2025/0015", marks: [70,100,100,100,69,100,100], total: "639/700", grade: "A++" },
+        "0016": { name: "SHUBHAM PANDEY", father: "HARI PRAKASH PANDEY", roll: "JK/ADCA/2025/0016", marks: [77,68,69,77,81,100,100], total: "572/700", grade: "A++" },
+        "0017": { name: "ARSI KHAN", father: "MOHAMMAD NASEEM KHAN", roll: "JK/ADCA/2025/0017", marks: [77,59,69,62,70,100,100], total: "537/700", grade: "A+" },
+        "0018": { name: "AMIT KUMAR", father: "SURENDRA KUMAR", roll: "JK/ADCA/2025/0018", marks: [80,70,77,79,80,100,100], total: "586/700", grade: "A++" },
+        "0019": { name: "SHAHNAWAJ", father: "KAMAL AHMAD", roll: "JK/ADCA/2025/0019", marks: [60,80,80,77,77,100,100], total: "574/700", grade: "A++" },
+        "0020": { name: "FAHMIDA KHATOON", father: "MOHD AAZAM", roll: "JK/ADCA/2025/0020", marks: [90,89,81,79,80,100,100], total: "619/700", grade: "A++" },
+        "0021": { name: "SADIYA KHATOON", father: "MOHD IBRAHIM", roll: "JK/ADCA/2025/0021", marks: [92,95,90,83,80,100,100], total: "640/700", grade: "A++" },
+        "0022": { name: "JAINAB KHATOON", father: "MAHMOOB ALAM", roll: "JK/ADCA/2025/0022", marks: [77,68,78,60,78,100,100], total: "561/700", grade: "A++" },
+        "0023": { name: "MOHD FARHAN", father: "MOHD CHUNNE KHAN", roll: "JK/ADCA/2025/0023", marks: [60,58,55,65,55,77,100], total: "470/700", grade: "A" },
+        "0024": { name: "ANSHU MISHRA", father: "AKHILESH KUMAR MISHRA", roll: "JK/ADCA/2025/0024", marks: [88,90,83,80,80,100,100], total: "621/700", grade: "A++" },
+        "0026": { name: "NEHA", father: "RAM SUBHAG", roll: "JK/DCA/2026/0026", marks: [89,81,67,82,68,100,100], total: "587/700", grade: "A++" },
+        "0027": { name: "NEHA", father: "SADANAND YADAV", roll: "JK/DCA/2026/0027", marks: [90,85,70,90,65,100,100], total: "600/700", grade: "A++" },
+        "0028": { name: "SHAMIMA KHATOON", father: "SIDDIK ANSARI", roll: "JK/ADCA/2026/0028", marks: [80,83,81,67,77,100,100], total: "588/700", grade: "A++" },
+        "0029": { name: "SANJU VISHVKARMA", father: "PURNMASI", roll: "JK/ADCA/2026/0029", marks: [83,90,87,88,70,100,100], total: "618/700", grade: "A++" },
+        "0030": { name: "MAMTA", father: "SWAMINATH NISHAD", roll: "JK/ADCA/2026/0030", marks: [85,90,86,88,70,100,100], total: "619/700", grade: "A++" },
+        "0031": { name: "ROHIT YADAV", father: "SHIVMANGAL", roll: "JK/DCA/2026/0031", marks: [91,90,89,60,80,100,100], total: "610/700", grade: "A++" },
+        "0032": { name: "RAGINI", father: "SHRINATH", roll: "JK/ADCA/2026/0032", marks: [90,89,88,77,81,100,100], total: "625/700", grade: "A++" },
+        "0033": { name: "MANISHA VISHVKARMA", father: "OM PRAKASH", roll: "JK/ADCA/2026/0033", marks: [90,90,89,91,77,100,100], total: "637/700", grade: "A++" },
+        "0034": { name: "AKASH SHARMA", father: "BHOLA PRASAD", roll: "JK/ADCA/2026/0034", marks: [80,77,65,67,77,100,100], total: "566/700", grade: "A++" },
+        "0035": { name: "ANSH", father: "VISHWANATH", roll: "JK/ADCA/2026/0035", marks: [77,67,80,70,60,55,100], total: "509/700", grade: "A+" }
+    };
+
+    const subNames = ["Fundamentals", "MS Word", "MS Excel", "MS PowerPoint", "Tally", "Internet", "Practical"];
+
+    function checkResult() {
+        let input = document.getElementById("rollNo").value.trim();
+        const sheet = document.getElementById("marksheet");
+        if (students[input]) {
+            const s = students[input];
+            sheet.style.display = "block";
+            document.getElementById("studentDetails").innerHTML = `<div><strong>Student:</strong> ${s.name}<br><strong>Father:</strong> ${s.father}</div><div style="text-align:right"><strong>Roll:</strong> ${s.roll}</div>`;
+            let rows = "";
+            s.marks.forEach((m, i) => { rows += `<tr><td>${i+1}</td><td>${subNames[i]}</td><td>100</td><td>${m}</td></tr>`; });
+            document.getElementById("marksBody").innerHTML = rows;
+            document.getElementById("total").innerText = s.total;
+            document.getElementById("grade").innerText = s.grade;
+        } else { alert("Error: Is number ka record nahi mila (0001-0035 enter karein)"); sheet.style.display = "none"; }
+    }
+</script>
+</body>
+</html>
